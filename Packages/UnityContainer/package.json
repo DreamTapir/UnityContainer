@@ -14,5 +14,12 @@
     "author": {
       "name": "DreamTapir",
       "url": "https://github.com/DreamTapir"
-    }
+    },
+    "samples": [
+      {
+        "displayName": "Unity Container Sample",
+        "description": "Unity Container sample for Unity Container",
+        "path": "./Samples/UnityContainerSample"
+      }
+    ]
 }
