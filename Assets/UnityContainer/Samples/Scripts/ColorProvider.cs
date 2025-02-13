@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UnityValidator.Samples
+namespace UnityContainer.Samples
 {
     public class ColorProvider : MonoBehaviour, IColorProvider 
     {

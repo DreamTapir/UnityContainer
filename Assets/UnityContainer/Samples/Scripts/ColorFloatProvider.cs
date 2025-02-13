@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace UnityValidator.Samples
+namespace UnityContainer.Samples
 {
-    public class FloatProvider : MonoBehaviour, IFloatProvider
+    public class ColorFloatProvider : ColorProvider, IFloatProvider
     {
         public float Value => _value;
         [SerializeField] private float _value;

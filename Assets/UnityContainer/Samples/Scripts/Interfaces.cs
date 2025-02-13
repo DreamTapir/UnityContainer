@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UnityValidator.Samples
+namespace UnityContainer.Samples
 {
     public interface IIntProvider
     {

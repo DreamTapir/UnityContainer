@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace UnityValidator
+namespace UnityContainer
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Method)]
     public class ValidateAttribute : PropertyAttribute

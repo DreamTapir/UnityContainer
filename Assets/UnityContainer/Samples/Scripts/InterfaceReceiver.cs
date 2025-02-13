@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace UnityValidator.Samples
+namespace UnityContainer.Samples
 {
     public class InterfaceReceiver : MonoBehaviour
     {

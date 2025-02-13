@@ -1,6 +1,6 @@
 using System;
 
-namespace UnityValidator
+namespace UnityContainer
 {
     public interface IContainer
     {

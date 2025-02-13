@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-namespace UnityValidator
+namespace UnityContainer
 {
-    public static class ContainerDictionaryExtension
+    public static class ContainerExtension
     {
         #region Register
         public static void RegisterSelfAndBaseType(this ConcurrentDictionary<Type, Instance> typeInstancePairs, object self)

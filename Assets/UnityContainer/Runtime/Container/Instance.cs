@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace UnityValidator
+namespace UnityContainer
 {
     public class Instance : IDisposable
     {

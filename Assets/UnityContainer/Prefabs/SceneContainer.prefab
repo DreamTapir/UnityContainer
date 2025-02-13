@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 428172419894422118}
   - component: {fileID: 5681411700093051975}
   m_Layer: 0
-  m_Name: GlobalContainer
+  m_Name: SceneContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,5 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5ea2682d803968419578b68a45936b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isIncludeInactive: 0
-  _isAutoRegisterOnAwake: 1
+  _includeInactive: 0
+  _autoValidateOnAwake: 1

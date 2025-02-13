@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace UnityValidator
+namespace UnityContainer
 {
     [DefaultExecutionOrder(-9999)]
-    public class GlobalContainer : MonoBehaviour, IContainer
+    public class SceneContainer : MonoBehaviour, IContainer
     {
         #region Private
         [SerializeField] private bool _includeInactive = false;
