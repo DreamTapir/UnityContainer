@@ -1,26 +1,25 @@
 {
-    "name": "com.DreamTapir.unity-container",
-    "displayName": "UnityContainer",
+    "name": "com.dreamtapir.unity-container",
     "version": "1.0.0",
-    "unity": "6000.0.22",
+    "displayName": "UnityContainer",
     "description": "dependency injection container package",
+    "unity": "6000.0",
+    "unityRelease":"33f1",
+    "keywords": [
+      "DI Container",
+      "Component",
+      "Container",
+      "Injection"
+    ],
     "author": {
-        "name": "DreamTapir",
-        "url": "https://github.com/DreamTapir"
-      },
-      "keywords": [
-        "Di Container",
-        "Component",
-        "Container",
-        "injection"
-      ],
-      "dependencies": {
-      },
-      "samples": [
-        {
-          "displayName": "Unity Container Sample",
-          "description": "unity container sample for Unity Container",
-          "path": "./Samples"
-        }
-      ]
+      "name": "DreamTapir",
+      "url": "https://github.com/DreamTapir"
+    },
+    "samples": [
+      {
+        "displayName": "Unity Container Sample",
+        "description": "unity container sample for Unity Container",
+        "path": "./Samples"
+      }
+    ]
 }
