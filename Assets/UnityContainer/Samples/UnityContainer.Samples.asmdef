@@ -1,0 +1,16 @@
+{
+    "name": "UnityContainer.Samples",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9afaf26148d96d540a012e8910f58d37"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

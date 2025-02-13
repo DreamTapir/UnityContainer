@@ -1,0 +1,26 @@
+{
+    "name": "com.DreamTapir.unity-container",
+    "displayName": "UnityContainer",
+    "version": "1.0.0",
+    "unity": "6000.0.22",
+    "description": "dependency injection container package",
+    "author": {
+        "name": "DreamTapir",
+        "url": "https://github.com/DreamTapir"
+      },
+      "keywords": [
+        "Di Container",
+        "Component",
+        "Container",
+        "injection"
+      ],
+      "dependencies": {
+      },
+      "samples": [
+        {
+          "displayName": "Unity Container Sample",
+          "description": "unity container sample for Unity Container",
+          "path": "./Samples"
+        }
+      ]
+}
