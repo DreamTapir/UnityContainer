@@ -15,7 +15,7 @@ namespace UnityContainer.Samples
         {
             _intProviders = intProviders;
 
-            Debug.Log($"[{gameObject.name}] IntProvider Count:{intProviders.Count()}");
+            Debug.Log($"[{gameObject.name}] IntProvider Count:{_intProviders.Count()}");
         }
 
         private void Start()

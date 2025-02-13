@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace UnityContainer
 {
+    /// <summary>
+    /// Container for storing instances in Scene
+    /// </summary>
     [DefaultExecutionOrder(-9999)]
     public class SceneContainer : MonoBehaviour, IContainer
     {
@@ -13,7 +16,7 @@ namespace UnityContainer
         [SerializeField] private bool _includeInactive = false;
         [SerializeField] private bool _autoValidateOnAwake = true;
 
-        private ConcurrentDictionary<Type, Instance> _typeInstancePairs = new();
+        private ConcurrentDictionary<Type, InstanceContainer> _typeContainerPairs = new();
 
         private IEnumerable<Component> GetComponentsInScene(bool includeInactive)
         {
@@ -25,7 +28,7 @@ namespace UnityContainer
 #endif
         }
 
-        private void RegisterAndValidateInSceneObjects()
+        private void RegisterAndValidateObjectsInScene()
         {
             var components = GetComponentsInScene(_includeInactive);
             foreach (var component in components.Where(c => c != this))
@@ -44,54 +47,46 @@ namespace UnityContainer
         {
             if (_autoValidateOnAwake)
             {
-                RegisterAndValidateInSceneObjects();
+                RegisterAndValidateObjectsInScene();
             }
         }
 
         protected virtual void OnDestroy()
         {
-            foreach (var pair in _typeInstancePairs)
+            foreach (var pair in _typeContainerPairs)
             {
                 pair.Value.Dispose();
             }
-            _typeInstancePairs.Clear();
-            _typeInstancePairs = null;
+            _typeContainerPairs.Clear();
+            _typeContainerPairs = null;
         }
         #endregion
 
         #region IContainer
         public void Register(object obj)
         {
-            _typeInstancePairs.RegisterSelfAndBaseType(obj);
-            _typeInstancePairs.RegisterInterface(obj);
+            _typeContainerPairs.RegisterSelfAndBaseType(obj);
+            _typeContainerPairs.RegisterInterface(obj);
         }
 
         public void Unregister(object obj)
         {
-            if (_typeInstancePairs.ContainsKey(obj.GetType()))
+            if (_typeContainerPairs.ContainsKey(obj.GetType()))
             {
-                _typeInstancePairs.TryRemove(obj.GetType(), out var instance);
+                _typeContainerPairs.TryRemove(obj.GetType(), out var instance);
                 instance?.Remove(obj);
             }
         }
 
         public object Resolve(Type type)
         {
-            object obj = null;
+            object obj;
 
-            if (_typeInstancePairs.ContainsKey(type))
+            if (!_typeContainerPairs.TryGetInstance(type, out obj) &&
+                !_typeContainerPairs.TryGetList(type, out obj) &&
+                !_typeContainerPairs.TryGetArray(type, out obj))
             {
-                obj = _typeInstancePairs[type].GetInstance();
-            }
-
-            if (obj == null)
-            {
-                _typeInstancePairs.TryGetList(type, out obj);
-            }
-
-            if (obj == null)
-            {
-                _typeInstancePairs.TryGetArray(type, out obj);
+                Debug.LogError($"[{gameObject.name}] Not register " + type);
             }
 
             return obj;

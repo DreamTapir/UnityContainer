@@ -8,30 +8,20 @@ namespace UnityContainer
 {
     public static class ObjectExtension
     {
-        public static IEnumerable<FieldInfo> FieldsOfAttribute<T>(this object obj, BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
+        public static IEnumerable<FieldInfo> GetFieldsOfAttribute<T>(this object obj, BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
         {
-            return FieldsOfAttribute<T>(obj.GetType(), flags);
+            return obj.GetType().GetFields(flags).Where(f => Attribute.IsDefined(f, typeof(T)));
         }
 
-        public static IEnumerable<FieldInfo> FieldsOfAttribute<T>(this Type type, BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
+        public static IEnumerable<MethodInfo> GetMethodsOfAttribute<T>(this object obj, BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
         {
-            return type.GetFields(flags).Where(f => Attribute.IsDefined(f, typeof(T)));
-        }
-
-        public static IEnumerable<MethodInfo> MethodsOfAttribute<T>(this object obj)
-        {
-            return MethodsOfAttribute<T>(obj.GetType());
-        }
-
-        public static IEnumerable<MethodInfo> MethodsOfAttribute<T>(this Type type)
-        {
-            return type.GetMethods().Where(m => Attribute.IsDefined(m, typeof(T)));
+            return obj.GetType().GetMethods(flags).Where(m => Attribute.IsDefined(m, typeof(T)));
         }
 
         public static void Validate(this object obj, IContainer targetContainer)
         {
-            // Fields
-            foreach (var f in obj.FieldsOfAttribute<ValidateAttribute>())
+            // Validate Field
+            foreach (var f in obj.GetFieldsOfAttribute<ValidateAttribute>())
             {
                 var value = f.GetValue(obj);
                 var attribute = f.GetCustomAttribute<ValidateAttribute>();
@@ -49,8 +39,8 @@ namespace UnityContainer
                 f.SetValue(obj, value);
             }
 
-            // Methods
-            foreach (var m in obj.MethodsOfAttribute<ValidateAttribute>())
+            // Validate Method
+            foreach (var m in obj.GetMethodsOfAttribute<ValidateAttribute>())
             {
                 var attribute = m.GetCustomAttribute<ValidateAttribute>();
                 var parameters = m.GetParameters();

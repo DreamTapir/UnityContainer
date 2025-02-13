@@ -4,7 +4,10 @@ using System.Linq;
 
 namespace UnityContainer
 {
-    public class Instance : IDisposable
+    /// <summary>
+    /// Container for storing instances of the same Type
+    /// </summary>
+    public class InstanceContainer : IDisposable
     {
         private List<object> _instances = new List<object>();
 

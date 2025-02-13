@@ -7,83 +7,93 @@ namespace UnityContainer
     public static class ContainerExtension
     {
         #region Register
-        public static void RegisterSelfAndBaseType(this ConcurrentDictionary<Type, Instance> typeInstancePairs, object self)
+        public static void RegisterSelfAndBaseType(this ConcurrentDictionary<Type, InstanceContainer> typeContainerPairs, object self)
         {
             var type = self.GetType();
             while (type != null)
             {
-                typeInstancePairs.TryGetValue(type, out var instance);
+                typeContainerPairs.TryGetValue(type, out var instance);
                 if (instance == null)
                 {
-                    instance = new Instance();
+                    instance = new InstanceContainer();
                 }
                 instance.Add(self);
-                typeInstancePairs[type] = instance;
+                typeContainerPairs[type] = instance;
                 type = type.BaseType;
             }
         }
 
-        public static void RegisterInterface(this ConcurrentDictionary<Type, Instance> typeInstancePairs, object self)
+        public static void RegisterInterface(this ConcurrentDictionary<Type, InstanceContainer> typeContainerPairs, object self)
         {
             foreach (var type in self.GetType().GetInterfaces())
             {
-                typeInstancePairs.TryGetValue(type, out var instance);
+                typeContainerPairs.TryGetValue(type, out var instance);
                 if (instance == null)
                 {
-                    instance = new Instance();
+                    instance = new InstanceContainer();
                 }
                 instance.Add(self);
-                typeInstancePairs[type] = instance;
+                typeContainerPairs[type] = instance;
             }
         }
         #endregion
 
         #region Resolve
-        public static bool TryGetList(this ConcurrentDictionary<Type, Instance> typeInstancePairs, Type type, out object obj)
+        public static bool TryGetInstance(this ConcurrentDictionary<Type, InstanceContainer> typeContainerPairs, Type type, out object instance)
         {
-            obj = null;
+            instance = null;
+            if (typeContainerPairs.ContainsKey(type))
+            {
+                instance = typeContainerPairs[type].GetInstance();
+            }
+            return instance != null;
+        }
+
+        public static bool TryGetList(this ConcurrentDictionary<Type, InstanceContainer> typeContainerPairs, Type type, out object instance)
+        {
+            instance = null;
             if (type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(List<>) || type.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
             {
                 var itemType = type.GenericTypeArguments[0];
 
-                if (typeInstancePairs.ContainsKey(itemType))
+                if (typeContainerPairs.ContainsKey(itemType))
                 {
                     var listType = typeof(List<>).MakeGenericType(itemType);
                     var list = Activator.CreateInstance(listType);
 
-                    foreach (var item in typeInstancePairs[itemType].GetInstances())
+                    foreach (var item in typeContainerPairs[itemType].GetInstances())
                     {
                         listType.GetMethod("Add")?.Invoke(list, new[] { item });
                     }
 
-                    obj = list;
+                    instance = list;
                 }
             }
 
-            return obj != null;
+            return instance != null;
         }
 
-        public static bool TryGetArray(this ConcurrentDictionary<Type, Instance> typeInstancePairs, Type type, out object obj)
+        public static bool TryGetArray(this ConcurrentDictionary<Type, InstanceContainer> typeContainerPairs, Type type, out object instance)
         {
-            obj = null;
+            instance = null;
             if (type.IsArray)
             {
                 var elementType = type.GetElementType();
 
-                if (typeInstancePairs.ContainsKey(elementType))
+                if (typeContainerPairs.ContainsKey(elementType))
                 {
-                    var instances = typeInstancePairs[elementType].GetInstances();
+                    var instances = typeContainerPairs[elementType].GetInstances();
                     var array = Array.CreateInstance(elementType, instances.Count);
 
                     for (var i = 0; i < instances.Count; i++)
                     {
                         array.SetValue(instances[i], i);
                     }
-                    obj = array;
+                    instance = array;
                 }
             }
 
-            return obj != null;
+            return instance != null;
         }
         #endregion
     }
