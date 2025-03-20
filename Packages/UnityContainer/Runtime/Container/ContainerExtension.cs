@@ -12,13 +12,12 @@ namespace UnityContainer
             var type = self.GetType();
             while (type != null)
             {
-                typeContainerPairs.TryGetValue(type, out var instance);
-                if (instance == null)
+                if (!typeContainerPairs.TryGetValue(type, out var container))
                 {
-                    instance = new InstanceContainer();
+                    container = new InstanceContainer();
                 }
-                instance.Add(self);
-                typeContainerPairs[type] = instance;
+                container.Add(self);
+                typeContainerPairs[type] = container;
                 type = type.BaseType;
             }
         }
@@ -27,13 +26,12 @@ namespace UnityContainer
         {
             foreach (var type in self.GetType().GetInterfaces())
             {
-                typeContainerPairs.TryGetValue(type, out var instance);
-                if (instance == null)
+                if (!typeContainerPairs.TryGetValue(type, out var container))
                 {
-                    instance = new InstanceContainer();
+                    container = new InstanceContainer();
                 }
-                instance.Add(self);
-                typeContainerPairs[type] = instance;
+                container.Add(self);
+                typeContainerPairs[type] = container;
             }
         }
         #endregion

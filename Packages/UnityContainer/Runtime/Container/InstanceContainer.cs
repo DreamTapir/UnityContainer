@@ -5,7 +5,7 @@ using System.Linq;
 namespace UnityContainer
 {
     /// <summary>
-    /// Container for storing instances of the same Type
+    /// Container for storing instances of the same Type or Interface
     /// </summary>
     public class InstanceContainer : IDisposable
     {

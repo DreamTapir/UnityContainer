@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace UnityContainer
@@ -12,54 +13,11 @@ namespace UnityContainer
     [DefaultExecutionOrder(-9999)]
     public class SceneContainer : MonoBehaviour, IContainer
     {
-        #region Private
+        #region Private Fields
         [SerializeField] private bool _includeInactive = false;
-        [SerializeField] private bool _autoValidateOnAwake = true;
+        [SerializeField] private bool _autoInjectOnAwake = true;
 
         private ConcurrentDictionary<Type, InstanceContainer> _typeContainerPairs = new();
-
-        private IEnumerable<Component> GetComponentsInScene(bool includeInactive)
-        {
-            var scenePath = gameObject.scene.path;
-#if UNITY_2022_2_OR_NEWER
-            return FindObjectsByType<Component>(includeInactive ? FindObjectsInactive.Include : FindObjectsInactive.Exclude, FindObjectsSortMode.None).Where(c => c.gameObject.scene.path == scenePath);
-#else
-            return FindObjectsOfType<Component>(includeInactive).Where(c => c.gameObject.scene.path == scenePath);
-#endif
-        }
-
-        private void RegisterAndValidateObjectsInScene()
-        {
-            var components = GetComponentsInScene(_includeInactive);
-            foreach (var component in components.Where(c => c != this))
-            {
-                Register(component);
-            }
-            foreach (var component in components)
-            {
-                component.Validate(this);
-            }
-        }
-        #endregion
-
-        #region MonoBehaviour
-        private void Awake()
-        {
-            if (_autoValidateOnAwake)
-            {
-                RegisterAndValidateObjectsInScene();
-            }
-        }
-
-        protected virtual void OnDestroy()
-        {
-            foreach (var pair in _typeContainerPairs)
-            {
-                pair.Value.Dispose();
-            }
-            _typeContainerPairs.Clear();
-            _typeContainerPairs = null;
-        }
         #endregion
 
         #region IContainer
@@ -67,15 +25,6 @@ namespace UnityContainer
         {
             _typeContainerPairs.RegisterSelfAndBaseType(obj);
             _typeContainerPairs.RegisterInterface(obj);
-        }
-
-        public void Unregister(object obj)
-        {
-            if (_typeContainerPairs.ContainsKey(obj.GetType()))
-            {
-                _typeContainerPairs.TryRemove(obj.GetType(), out var instance);
-                instance?.Remove(obj);
-            }
         }
 
         public object Resolve(Type type)
@@ -95,6 +44,98 @@ namespace UnityContainer
         public T Resolve<T>()
         {
             return (T)Resolve(typeof(T));
+        }
+        #endregion
+
+        #region Private Methods
+        private IEnumerable<Component> GetComponentsInScene(bool includeInactive)
+        {
+            var scenePath = gameObject.scene.path;
+#if UNITY_2022_2_OR_NEWER
+            return FindObjectsByType<Component>(includeInactive ? FindObjectsInactive.Include : FindObjectsInactive.Exclude, FindObjectsSortMode.None).Where(c => c.gameObject.scene.path == scenePath);
+#else
+            return FindObjectsOfType<Component>(includeInactive).Where(c => c.gameObject.scene.path == scenePath);
+#endif
+        }
+
+        private IEnumerable<FieldInfo> GetFieldsOfAttribute<T>(object obj, BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
+        {
+            return obj.GetType().GetFields(flags).Where(f => Attribute.IsDefined(f, typeof(T)));
+        }
+
+        private IEnumerable<MethodInfo> GetMethodsOfAttribute<T>(object obj, BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
+        {
+            return obj.GetType().GetMethods(flags).Where(m => Attribute.IsDefined(m, typeof(T)));
+        }
+
+        private void Inject(object obj)
+        {
+            // Inject Field
+            foreach (var f in GetFieldsOfAttribute<InjectAttribute>(obj))
+            {
+                var value = f.GetValue(obj);
+                var attribute = f.GetCustomAttribute<InjectAttribute>();
+                var type = f.FieldType;
+
+                if (value != null)
+                    continue;
+
+                value = Resolve(type);
+
+                if (value == null && attribute.IsRequired == false)
+                    continue;
+
+                f.SetValue(obj, value);
+            }
+
+            // Inject Method
+            foreach (var m in GetMethodsOfAttribute<InjectAttribute>(obj))
+            {
+                var attribute = m.GetCustomAttribute<InjectAttribute>();
+                var parameters = m.GetParameters();
+                object[] values = new object[parameters.Length];
+
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    var parameter = parameters[i];
+                    var parameterType = parameter.ParameterType;
+
+                    values[i] = Resolve(parameterType);
+
+                    if (values[i] == null && attribute.IsRequired == false)
+                        continue;
+                }
+
+                m.Invoke(obj, values);
+            }
+        }
+        #endregion
+
+        #region MonoBehaviour
+        private void Awake()
+        {
+            if (_autoInjectOnAwake)
+            {
+                var components = GetComponentsInScene(_includeInactive);
+                foreach (var component in components)
+                {
+                    Register(component);
+                }
+                foreach (var component in components)
+                {
+                    Inject(component);
+                }
+            }
+        }
+
+        protected virtual void OnDestroy()
+        {
+            foreach (var pair in _typeContainerPairs)
+            {
+                pair.Value.Dispose();
+            }
+            _typeContainerPairs.Clear();
+            _typeContainerPairs = null;
         }
         #endregion
     }
