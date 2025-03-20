@@ -10,10 +10,10 @@ namespace UnityContainer.Samples
         private IFloatProvider _floatProvider;
         private IColorProvider _colorProvider;
 
-        [Validate]
-        public void Validate(IIntProvider[] intProviders, List<IFloatProvider> floatProviders, IEnumerable<IColorProvider> colorProviders)
+        [Inject]
+        public void Inject(IIntProvider[] intProviders, List<IFloatProvider> floatProviders, IEnumerable<IColorProvider> colorProviders)
         {
-            _intProvider = intProviders.Where(i => i.Value > 10).FirstOrDefault();
+            _intProvider = intProviders.Where(i => i.Value > 1).FirstOrDefault();
             _floatProvider = floatProviders.Where(f => f.Value > 0).FirstOrDefault();
             _colorProvider = colorProviders.Where(c => c.Color.g == 1f).FirstOrDefault();
 

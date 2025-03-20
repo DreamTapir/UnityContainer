@@ -7,11 +7,11 @@ namespace UnityContainer.Samples
     public class TypeReceiver : MonoBehaviour
     {
         [SerializeField] private List<IntProvider> _intProviders;
-        [Validate] private FloatProvider _floatProvider;
-        [Validate] private ColorProvider _colorProvider;
+        [Inject] private FloatProvider _floatProvider;
+        [Inject] private ColorProvider _colorProvider;
 
-        [Validate]
-        public void Validate(List<IntProvider> intProviders)
+        [Inject]
+        public void Inject(List<IntProvider> intProviders)
         {
             _intProviders = intProviders;
 
