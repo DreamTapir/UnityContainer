@@ -16,17 +16,17 @@ https://github.com/DreamTapir/UnityContainer.git?path=Packages/UnityContainer
 1. Place a SceneContainer Prefab in the scene
 <img width="336" alt="image" src="https://github.com/user-attachments/assets/46f48793-ea5c-44f7-84e4-6c2853e9f44b" />
 
-2. Assign the [Validate] attribute to the Field or Method want to validate in the MonoBehaviour class
+2. Assign the [Inject] attribute to the Field or Method want to inject in the MonoBehaviour class
 ```C#
   public class ExampleClass : MonoBehaviour
   {
-      [Validate]
+      [Inject]
       private IIntProvider _intProvider;
       private IFloatProvider _floatProvider;
       private IColorProvider _colorProvider;
 
-      [Validate]
-      public void Validate(List<IFloatProvider> floatProviders, IEnumerable<IColorProvider> colorProviders)
+      [Inject]
+      public void Inject(List<IFloatProvider> floatProviders, IEnumerable<IColorProvider> colorProviders)
       {
           _floatProvider = floatProviders.Where(f => f.Value > 0).FirstOrDefault();
           _colorProvider = colorProviders.Where(c => c.Color.g == 1f).FirstOrDefault();
